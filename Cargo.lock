@@ -795,10 +795,7 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "aes-gcm",
- "chrono",
  "clap",
- "colored 3.0.0",
- "fern",
  "log",
  "pqcrypto",
  "pqcrypto-kyber",
@@ -809,6 +806,11 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
+ "chrono",
+ "clap",
+ "colored 3.0.0",
+ "fern",
+ "log",
  "tokio",
 ]
 
