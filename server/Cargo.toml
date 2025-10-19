@@ -12,3 +12,5 @@ pqcrypto-kyber = "0.8.1"
 aes-gcm = "0.10.3"
 clap = { version = "4.5.49", features = ["derive"] }
 log = "0.4.28"
+serde = {version = "1.0.228", features = ["derive"]}
+serde_ini = "0.2.0"

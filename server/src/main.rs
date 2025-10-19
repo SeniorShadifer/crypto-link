@@ -1,3 +1,5 @@
+mod conf;
+
 use clap::Parser;
 
 #[derive(clap::Parser, Debug)]
@@ -12,8 +14,13 @@ struct Arguments {
 fn main() {
     let arguments = Arguments::parse();
 
-    shared
+    shared::log
         ::setup_logger(format!("{}/.log", arguments.server_data_path))
         .expect("Cannot setup logger!");
     log::info!("Logger successfully installed!");
+
+    let config_path = format!("{}/.conf", arguments.server_data_path);
+    let configuration = conf::ServerConfiguration::load_from_file(config_path.as_str());
+    log::info!("Configuration successfully loaded!");
+    log::debug!("Configuration: {:#?}", configuration);
 }
