@@ -860,6 +860,8 @@ dependencies = [
  "colored 3.0.0",
  "fern",
  "log",
+ "pqcrypto",
+ "pqcrypto-kyber",
  "tokio",
 ]
 
