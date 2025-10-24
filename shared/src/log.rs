@@ -1,6 +1,9 @@
 use colored::*;
 
-pub fn setup_logger(log_file_path: String) -> Result<(), Box<dyn std::error::Error>> {
+pub fn setup_logger(
+    log_file_path: String,
+    log_level: &str
+) -> Result<(), Box<dyn std::error::Error>> {
     let colors = fern::colors::ColoredLevelConfig
         ::new()
         .error(fern::colors::Color::Red)
@@ -30,7 +33,14 @@ pub fn setup_logger(log_file_path: String) -> Result<(), Box<dyn std::error::Err
                 )
             )
         })
-        .level(log::LevelFilter::Debug)
+        .level(match log_level {
+            "ERROR" => log::LevelFilter::Error,
+            "WARN" => log::LevelFilter::Warn,
+            "INFO" => log::LevelFilter::Info,
+            "DEBUG" => log::LevelFilter::Debug,
+            "TRACE" => log::LevelFilter::Trace,
+            _ => log::LevelFilter::Debug,
+        })
         .chain(std::io::stdout())
         .chain(
             std::fs::OpenOptions::new().write(true).append(true).create(true).open(log_file_path)?

@@ -5,7 +5,7 @@ fn main() {
     std::fs
         ::copy(
             cargo_root.join("default.conf"),
-            workspace_root.join("target").join(profile).join("default.conf")
+            workspace_root.join("target").join(profile).join("default.server.conf")
         )
         .unwrap();
 }

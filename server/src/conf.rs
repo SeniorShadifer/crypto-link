@@ -14,12 +14,41 @@ impl ServerConfiguration {
         if Path::new(path).exists() {
             return Ok(serde_ini::from_str(std::fs::read_to_string(path)?.as_str())?);
         } else {
+            log::info!(
+                "Configuration file '{}' is not exists. Trying to load default values...",
+                path
+            );
+
             shared::fs::create_path_to_file(path)?;
-            std::fs::copy(std::env::current_exe()?.join("..").join("default.conf"), path)?;
-            return Ok(ServerConfiguration {
-                server: ServerSection::default(),
-                encryption: EncryptionSection::default(),
-            });
+
+            let default_conf_file_name = "default.server.conf";
+            let path_to_default_conf = std::env
+                ::current_exe()?
+                .join("..")
+                .join(default_conf_file_name);
+
+            if !path_to_default_conf.exists() {
+                return Err(
+                    Box::new(
+                        std::io::Error::new(
+                            std::io::ErrorKind::NotFound,
+                            format!("One of system package files ('<PROGRAM_ROOT>/{}') is not exists. Try reinstall program.", default_conf_file_name)
+                        )
+                    )
+                );
+            }
+
+            std::fs::copy(path_to_default_conf, path)?;
+            return Ok(serde_ini::from_str(std::fs::read_to_string(path)?.as_str())?);
+        }
+    }
+}
+
+impl Default for ServerConfiguration {
+    fn default() -> Self {
+        Self {
+            server: ServerSection::default(),
+            encryption: EncryptionSection::default(),
         }
     }
 }
