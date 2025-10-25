@@ -1,5 +1,7 @@
 use std::path::Path;
 
+use serde::Deserialize;
+
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ServerConfiguration {
     #[serde(default)]
@@ -67,12 +69,24 @@ impl Default for ServerSection {
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct EncryptionSection {
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_bool")]
     use_assymetric_incapsulation: bool,
+
+    #[serde(default)]
+    incapsulation_algorythm: String,
 }
 
 impl Default for EncryptionSection {
     fn default() -> Self {
-        Self { use_assymetric_incapsulation: true }
+        Self {
+            use_assymetric_incapsulation: true,
+            incapsulation_algorythm: "Kyber1024".to_string(),
+        }
     }
+}
+
+fn deserialize_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
+    where D: serde::Deserializer<'de>
+{
+    return Ok(String::deserialize(deserializer)?.parse().map_err(serde::de::Error::custom)?);
 }
