@@ -12,3 +12,4 @@ colored = "3.0.0"
 clap = { version = "4.5.49", features = ["derive"] }
 pqcrypto = "0.18.1"
 pqcrypto-kyber = "0.8.1"
+custom_error = "1.9.2"
