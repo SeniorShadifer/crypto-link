@@ -1,23 +1,12 @@
 mod conf;
+mod args;
 
 use clap::Parser;
 
 use crate::conf::ServerConfiguration;
 
-#[derive(clap::Parser, Debug)]
-#[command(name = "CryptoLink Server")]
-#[command(about = "Server for CryptoLink - messenger with assymetric encryption.")]
-struct Arguments {
-    /// Path to directory, which contains server configuration, database, files and other data.
-    #[arg(short, long, default_value = "./server_data")]
-    server_data_path: String,
-
-    #[arg(short, long, default_value = "DEBUG")]
-    log_level: String,
-}
-
 fn main() {
-    let arguments = Arguments::parse();
+    let arguments = args::Arguments::parse();
 
     shared::log
         ::setup_logger(format!("{}/.log", arguments.server_data_path), arguments.log_level.as_str())
