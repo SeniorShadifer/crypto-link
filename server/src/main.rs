@@ -5,7 +5,8 @@ use clap::Parser;
 
 use crate::conf::ServerConfiguration;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let arguments = args::Arguments::parse();
 
     shared::log
