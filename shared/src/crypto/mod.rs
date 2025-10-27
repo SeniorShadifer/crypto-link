@@ -1,3 +1,5 @@
+use pqcrypto::traits::kem::{ PublicKey, SecretKey, Ciphertext, SharedSecret };
+
 pub trait AssymetricEncryptionAlgorythm {
     fn keypair(&self) -> Result<(KEMPublicKey, KEMSecretKey), Box<dyn std::error::Error>>;
 
@@ -43,9 +45,22 @@ pub trait SymmetricEncryptionAlgorythm {
     fn decrypt(&self, key: &[u8], message: &[u8]) -> &[u8];
 }
 
+pub trait Encodable {
+    fn encode(&self) -> &[u8];
+}
+
 pub enum KEMPublicKey {
     Polymorphic(Box<dyn pqcrypto::traits::kem::PublicKey>),
     Kyber1024(pqcrypto_kyber::kyber1024::PublicKey),
+}
+
+impl Encodable for KEMPublicKey {
+    fn encode(&self) -> &[u8] {
+        match self {
+            Self::Polymorphic(value) => value.as_bytes(),
+            Self::Kyber1024(value) => value.as_bytes(),
+        }
+    }
 }
 
 pub enum KEMSecretKey {
@@ -53,14 +68,41 @@ pub enum KEMSecretKey {
     Kyber1024(pqcrypto_kyber::kyber1024::SecretKey),
 }
 
+impl Encodable for KEMSecretKey {
+    fn encode(&self) -> &[u8] {
+        match self {
+            Self::Polymorphic(value) => value.as_bytes(),
+            Self::Kyber1024(value) => value.as_bytes(),
+        }
+    }
+}
+
 pub enum KEMCiphertext {
     Polymorphic(Box<dyn pqcrypto::traits::kem::Ciphertext>),
     Kyber1024(pqcrypto_kyber::kyber1024::Ciphertext),
 }
 
+impl Encodable for KEMCiphertext {
+    fn encode(&self) -> &[u8] {
+        match self {
+            Self::Polymorphic(value) => value.as_bytes(),
+            Self::Kyber1024(value) => value.as_bytes(),
+        }
+    }
+}
+
 pub enum KEMSharedSecret {
     Polymorphic(Box<dyn pqcrypto::traits::kem::SharedSecret>),
     Kyber1024(pqcrypto_kyber::kyber1024::SharedSecret),
+}
+
+impl Encodable for KEMSharedSecret {
+    fn encode(&self) -> &[u8] {
+        match self {
+            Self::Polymorphic(value) => value.as_bytes(),
+            Self::Kyber1024(value) => value.as_bytes(),
+        }
+    }
 }
 
 custom_error::custom_error! { pub EncapsulationError
@@ -78,11 +120,16 @@ pub enum SupportedAssymetricEncryptionAlgorythms {
     Kyber1024(kyber1024::Kyber1024),
 }
 
+custom_error::custom_error! {pub SelectionError
+    NotFound = "Element not found",
+    UnknownSelectionError = "Unknown selection error"
+}
+
 impl SupportedAssymetricEncryptionAlgorythms {
-    pub fn select_algorythm_by_str(name: &str) -> Box<dyn AssymetricEncryptionAlgorythm> {
+    pub fn select(name: &str) -> Result<Box<dyn AssymetricEncryptionAlgorythm>, SelectionError> {
         match name {
-            "Kyber1024" => Box::new(kyber1024::Kyber1024),
-            _ => Box::new(kyber1024::Kyber1024),
+            "Kyber1024" => Ok(Box::new(kyber1024::Kyber1024)),
+            _ => Err(SelectionError::NotFound),
         }
     }
 }
