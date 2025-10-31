@@ -7,6 +7,9 @@ use crate::conf::ServerConfiguration;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+    log::info!("Logger successfully installed!");
+
     let arguments = args::Arguments::parse();
 
     let configuration = match
@@ -26,14 +29,6 @@ async fn main() {
             ServerConfiguration::default()
         }
     };
-
-    shared::log
-        ::setup_logger(
-            format!("{}/.log", arguments.server_data_path),
-            configuration.logging.log_level.as_str()
-        )
-        .expect("Cannot setup logger!");
-    log::info!("Logger successfully installed!");
 
     log::debug!("Configuration: \n{:#?}", configuration);
 

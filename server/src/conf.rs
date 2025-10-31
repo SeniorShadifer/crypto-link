@@ -9,9 +9,6 @@ pub struct ServerConfiguration {
 
     #[serde(default)]
     encryption: EncryptionSection,
-
-    #[serde(default)]
-    pub logging: LoggingSection,
 }
 
 impl ServerConfiguration {
@@ -54,7 +51,6 @@ impl Default for ServerConfiguration {
         Self {
             server: ServerSection::default(),
             encryption: EncryptionSection::default(),
-            logging: LoggingSection::default(),
         }
     }
 }
@@ -85,20 +81,6 @@ impl Default for EncryptionSection {
         Self {
             use_assymetric_incapsulation: true,
             incapsulation_algorythm: "Kyber1024".to_string(),
-        }
-    }
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-pub struct LoggingSection {
-    #[serde(default)]
-    pub log_level: String,
-}
-
-impl Default for LoggingSection {
-    fn default() -> Self {
-        Self {
-            log_level: "INFO".to_string(),
         }
     }
 }
