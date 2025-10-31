@@ -11,6 +11,7 @@ async fn main() {
     log::info!("Logger successfully installed!");
 
     let arguments = args::Arguments::parse();
+    log::info!("Command line arguments successfully parsed!");
 
     let configuration = match
         conf::ServerConfiguration::load_from_file(
@@ -32,21 +33,32 @@ async fn main() {
 
     log::debug!("Configuration: \n{:#?}", configuration);
 
-    let connection = rusqlite::Connection
-        ::open(format!("{}/.db", arguments.server_data_path))
-        .unwrap_or_else(|e| {
-            log::error!("CRITICAL ERROR: Cannot create SQLite connection: {}", e);
-            panic!("{}", e);
-        });
+    let connection = std::sync::Arc::new(
+        std::sync::Mutex::new(
+            rusqlite::Connection
+                ::open(format!("{}/.db", arguments.server_data_path))
+                .unwrap_or_else(|e| {
+                    log::error!("CRITICAL ERROR: Cannot create SQLite connection: {}", e);
+                    panic!("{}", e);
+                })
+        )
+    );
 
     log::info!("SQLite connection initialized successfully!");
 
     connection
+        .lock()
+        .unwrap_or_else(|e| {
+            log::error!("CRITICAL ERROR: Cannot unwrap SQLite connection: {}", e);
+            panic!("{}", e);
+        })
         .execute(
             "CREATE TABLE IF NOT EXISTS users 
     (
         id INTEGER PRIMARY KEY,
         nickname TEXT NOT NULL,
+
+        register_date TIMESTAMP DEFAULT DEFAULT_TIMESTAMP,
 
         password_salt BYTEA,
         password_hashing_iterations INTEGER,
